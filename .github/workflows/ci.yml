@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: "Python ${{ matrix.python }}: lint, types, tests"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - name: Lint and format
+        run: |
+          ruff check .
+          ruff format --check .
+      - name: Type-check (strict)
+        run: mypy
+      - name: Tests (Claude's patches run through the real SDK against canned API responses)
+        run: pytest
+
+  evaluation:
+    name: Policies on fresh manifest forms, rightsizing on held-out workloads (gate)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: kubefleet evaluate --gate --out "$RUNNER_TEMP/eval"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evaluation-report
+          path: ${{ runner.temp }}/eval
+
+  container:
+    name: Container serves the dashboard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t kubefleet .
+      - name: Health check, the clusters API and a policy check
+        run: |
+          docker run -d --name kubefleet -p 8000:8000 kubefleet
+          for _ in $(seq 1 45); do curl -fs http://127.0.0.1:8000/healthz && break; sleep 2; done
+          curl -fs http://127.0.0.1:8000/api/clusters | python3 -c "import json,sys; d=json.load(sys.stdin); assert len(d) == 3"
+          curl -fs -X POST -H "Content-Type: application/json" -d '{"yaml":"kind: Pod\nmetadata: {name: x}\nspec:\n  containers: [{name: a, image: nginx}]"}' http://127.0.0.1:8000/api/check | grep -q run_as_root
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest git /repo --no-banner

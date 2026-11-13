@@ -1,0 +1,260 @@
+{
+  "rules": {
+    "privileged": "Container runs privileged",
+    "run_as_root": "Container may run as root",
+    "privilege_escalation": "Privilege escalation not disabled",
+    "dangerous_capabilities": "Adds dangerous Linux capabilities",
+    "no_limits": "Missing CPU or memory limits",
+    "no_requests": "Missing CPU or memory requests",
+    "unpinned_image": "Image is :latest or untagged",
+    "host_path": "Mounts a hostPath volume",
+    "host_namespaces": "Shares the host network, PID or IPC namespace",
+    "no_probes": "Long-running container without readiness or liveness probe",
+    "rbac_wildcard": "RBAC rule grants * verbs or resources"
+  },
+  "policies": {
+    "dev": {
+      "manifests": 360,
+      "violations": 597,
+      "engine": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_alarms_by_rule": {},
+        "missed_by_rule": {}
+      },
+      "naive": {
+        "precision": 0.635,
+        "recall": 0.844,
+        "f1": 0.725,
+        "false_alarms_by_rule": {
+          "dangerous_capabilities": 238,
+          "run_as_root": 52
+        },
+        "missed_by_rule": {
+          "rbac_wildcard": 26,
+          "no_requests": 20,
+          "privilege_escalation": 18,
+          "no_probes": 17,
+          "no_limits": 12
+        }
+      },
+      "autofix": {
+        "auto_fixable": 339,
+        "fixed": 339,
+        "introduced": 0,
+        "left_for_people": 258
+      }
+    },
+    "heldout": {
+      "manifests": 360,
+      "violations": 610,
+      "engine": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_alarms_by_rule": {},
+        "missed_by_rule": {}
+      },
+      "naive": {
+        "precision": 0.624,
+        "recall": 0.816,
+        "f1": 0.707,
+        "false_alarms_by_rule": {
+          "dangerous_capabilities": 257,
+          "run_as_root": 43
+        },
+        "missed_by_rule": {
+          "no_requests": 27,
+          "no_limits": 24,
+          "rbac_wildcard": 24,
+          "no_probes": 19,
+          "privilege_escalation": 18
+        }
+      },
+      "autofix": {
+        "auto_fixable": 348,
+        "fixed": 348,
+        "introduced": 0,
+        "left_for_people": 262
+      }
+    },
+    "fresh": {
+      "manifests": 360,
+      "violations": 226,
+      "engine": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_alarms_by_rule": {},
+        "missed_by_rule": {}
+      },
+      "naive": {
+        "precision": 0.228,
+        "recall": 0.628,
+        "f1": 0.335,
+        "false_alarms_by_rule": {
+          "dangerous_capabilities": 280,
+          "no_probes": 80,
+          "run_as_root": 40,
+          "host_namespaces": 40,
+          "privileged": 40
+        },
+        "missed_by_rule": {
+          "no_limits": 21,
+          "no_requests": 21,
+          "unpinned_image": 16,
+          "run_as_root": 14,
+          "rbac_wildcard": 12
+        }
+      },
+      "autofix": {
+        "auto_fixable": 142,
+        "fixed": 142,
+        "introduced": 0,
+        "left_for_people": 84
+      }
+    }
+  },
+  "rightsizing": {
+    "dev": {
+      "workloads": 200,
+      "recommended": {
+        "cpu_vs_current": 0.388,
+        "memory_vs_current": 0.532,
+        "time_above_cpu_request": 0.001,
+        "time_throttled": 0.0002,
+        "oom_killed_workloads": 0,
+        "oom_by_shape": {
+          "daily": 0,
+          "spiky": 0,
+          "steady": 0
+        }
+      },
+      "average_x1.2": {
+        "cpu_vs_current": 0.254,
+        "memory_vs_current": 0.502,
+        "time_above_cpu_request": 0.2191,
+        "time_throttled": 0.0006,
+        "oom_killed_workloads": 0,
+        "oom_by_shape": {
+          "daily": 0,
+          "spiky": 0,
+          "steady": 0
+        }
+      },
+      "current": {
+        "cpu_vs_current": 1.0,
+        "memory_vs_current": 1.0,
+        "time_above_cpu_request": 0.0001,
+        "time_throttled": 0.0,
+        "oom_killed_workloads": 0,
+        "oom_by_shape": {
+          "daily": 0,
+          "spiky": 0,
+          "steady": 0
+        }
+      }
+    },
+    "heldout": {
+      "workloads": 300,
+      "recommended": {
+        "cpu_vs_current": 0.404,
+        "memory_vs_current": 0.529,
+        "time_above_cpu_request": 0.001,
+        "time_throttled": 0.0002,
+        "oom_killed_workloads": 0,
+        "oom_by_shape": {
+          "daily": 0,
+          "spiky": 0,
+          "steady": 0
+        }
+      },
+      "average_x1.2": {
+        "cpu_vs_current": 0.269,
+        "memory_vs_current": 0.499,
+        "time_above_cpu_request": 0.2113,
+        "time_throttled": 0.0007,
+        "oom_killed_workloads": 0,
+        "oom_by_shape": {
+          "daily": 0,
+          "spiky": 0,
+          "steady": 0
+        }
+      },
+      "current": {
+        "cpu_vs_current": 1.0,
+        "memory_vs_current": 1.0,
+        "time_above_cpu_request": 0.0001,
+        "time_throttled": 0.0,
+        "oom_killed_workloads": 0,
+        "oom_by_shape": {
+          "daily": 0,
+          "spiky": 0,
+          "steady": 0
+        }
+      }
+    },
+    "held_back": {
+      "workloads": 200,
+      "recommended": {
+        "cpu_vs_current": 0.193,
+        "memory_vs_current": 0.545,
+        "time_above_cpu_request": 0.0134,
+        "time_throttled": 0.0119,
+        "oom_killed_workloads": 0,
+        "oom_by_shape": {
+          "batch": 0,
+          "leak": 0
+        }
+      },
+      "average_x1.2": {
+        "cpu_vs_current": 0.094,
+        "memory_vs_current": 0.393,
+        "time_above_cpu_request": 0.1821,
+        "time_throttled": 0.0182,
+        "oom_killed_workloads": 92,
+        "oom_by_shape": {
+          "batch": 92,
+          "leak": 0
+        }
+      },
+      "current": {
+        "cpu_vs_current": 1.0,
+        "memory_vs_current": 1.0,
+        "time_above_cpu_request": 0.0,
+        "time_throttled": 0.0,
+        "oom_killed_workloads": 0,
+        "oom_by_shape": {
+          "batch": 0,
+          "leak": 0
+        }
+      }
+    }
+  },
+  "checks": {
+    "heldout_policy_f1_min": 1.0,
+    "fresh_policy_f1_min": 1.0,
+    "autofix_introduced_max": 0,
+    "heldout_rightsizing_time_above_request_max": 0.001,
+    "held_back_oom_killed_max": 0,
+    "heldout_cpu_vs_current_max": 0.404
+  },
+  "gate": {
+    "heldout_policy_f1_min": 0.99,
+    "fresh_policy_f1_min": 0.98,
+    "autofix_introduced_max": 0,
+    "heldout_rightsizing_time_above_request_max": 0.01,
+    "held_back_oom_killed_max": 0,
+    "heldout_cpu_vs_current_max": 0.6
+  },
+  "passed": {
+    "heldout_policy_f1_min": true,
+    "fresh_policy_f1_min": true,
+    "autofix_introduced_max": true,
+    "heldout_rightsizing_time_above_request_max": true,
+    "held_back_oom_killed_max": true,
+    "heldout_cpu_vs_current_max": true
+  },
+  "ok": true
+}
